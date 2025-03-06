@@ -48,46 +48,35 @@
           name = "grayjay-fhs";
           targetPkgs = pkgs: with pkgs; [
             # Add all the dependencies Grayjay needs here
-            libz
-            icu
-            openssl
+    libz
+    icu
+    openssl # For updater
 
-            xorg.libX11
-            xorg.libXcomposite
-            xorg.libXdamage
-            xorg.libXext
-            xorg.libXfixes
-            xorg.libXrandr
-            xorg.libxcb
+    xorg.libX11
+    xorg.libXcomposite
+    xorg.libXdamage
+    xorg.libXext
+    xorg.libXfixes
+    xorg.libXrandr
+    xorg.libxcb
 
-            gtk3
-            glib
-            nss
-            nspr
-            dbus
-            atk
-            cups
-            libdrm
-            expat
-            libxkbcommon
-            pango
-            cairo
-            udev
-            alsa-lib
-            mesa
-            libGL
-            libsecret
-
-            # Additional dependencies (if needed)
-            zlib
-            libuuid
-            libappindicator
-            libnotify
-
-            # Add missing dependencies
-            upower
-            xdg-desktop-portal
-            libsecret
+    gtk3
+    glib
+    nss
+    nspr
+    dbus
+    atk
+    cups
+    libdrm
+    expat
+    libxkbcommon
+    pango
+    cairo
+    udev
+    alsa-lib
+    mesa
+    libGL
+    libsecret
           ];
 
           # Set environment variables and copy files to a writable directory
@@ -129,7 +118,6 @@
         grayjay-with-desktop = pkgs.symlinkJoin {
           name = "grayjay-with-desktop";
           paths = [
-            self.packages.${system}.grayjay
             self.packages.${system}.grayjay-fhs
             (pkgs.runCommand "grayjay-desktop-file" { } ''
               mkdir -p $out/share/applications
@@ -149,6 +137,5 @@
       };
 
       defaultPackage.${system} = self.packages.${system}.grayjay-with-desktop;
-      defaultApp.${system} = self.apps.${system}.grayjay;
     };
 }
