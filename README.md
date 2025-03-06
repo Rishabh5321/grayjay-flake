@@ -35,7 +35,7 @@ nix run github:rishabh5321/grayjay-flake
 
 You can install grayjay directly using the flake without integrating it into your NixOS configuration:
 ```bash
-nix profile install github:rishabh5321/grayjay-flake#grayjay-with-desktop
+nix profile install github:rishabh5321/grayjay-flake#grayjay-with-updater
 ```
 You will the app in the app launcher menu just simply enter to launch.
 
@@ -51,7 +51,7 @@ grayjay.url = "github:rishabh5321/grayjay-flake";
 ```nix
 { inputs, ... }: {
    imports = [
-      inputs.grayjay.packages.${pkgs.system}.grayjay-with-desktop
+      inputs.grayjay.packages.${pkgs.system}.grayjay-with-updater
    ];
 }
 ```
