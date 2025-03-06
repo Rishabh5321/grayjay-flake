@@ -52,7 +52,7 @@
         };
 
         # Desktop entry files
-        grayjay-desktop-files = pkgs.runCommand "grayjay-desktop-files" {} ''
+        grayjay-desktop-files = pkgs.runCommand "grayjay-desktop-files" { } ''
           mkdir -p $out/share/applications
           
           # Grayjay desktop file
@@ -220,7 +220,7 @@
             platforms = pkgs.lib.platforms.linux;
           };
         };
-        
+
         default = self.apps.${system}.grayjay;
       };
     };
