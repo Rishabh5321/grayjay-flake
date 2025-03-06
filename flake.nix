@@ -133,6 +133,12 @@
         grayjay = {
           type = "app";
           program = "${self.packages.${system}.grayjay-with-desktop}/bin/grayjay-fhs";
+          meta = {
+            description = "Desktop client for Grayjay, a platform for streaming and downloading video content";
+            license = pkgs.lib.licenses.unfree; # Adjust the license as needed
+            maintainers = [ ]; # Add maintainers if applicable
+            platforms = pkgs.lib.platforms.linux;
+          };
         };
       };
 
