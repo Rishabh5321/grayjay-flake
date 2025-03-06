@@ -1,4 +1,4 @@
-# Grayjay Flake CURRENTLY IN DEVLOPMENT AND NOT WORKING
+# Grayjay Flake
 
 [![NixOS](https://img.shields.io/badge/NixOS-supported-blue.svg)](https://nixos.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
@@ -29,13 +29,13 @@ This repository provides a Nix flake for Grayjay, an open-source media streaming
 You can run grayjay directly using the flake without integrating it into your NixOS configuration:
 
 ```bash
-nix run github:rishabh5321/grayjay-flake
+nix run github:rishabh5321/grayjay-flake#grayjay
 ```
 ### Using the Flake Profiles
 
 You can install grayjay directly using the flake without integrating it into your NixOS configuration:
 ```bash
-nix profile install github:rishabh5321/grayjay-flake#grayjay-with-updater
+nix profile install github:rishabh5321/grayjay-flake#grayjay
 ```
 You will the app in the app launcher menu just simply enter to launch.
 
@@ -51,7 +51,7 @@ grayjay.url = "github:rishabh5321/grayjay-flake";
 ```nix
 { inputs, ... }: {
    imports = [
-      inputs.grayjay.packages.${pkgs.system}.grayjay-with-updater
+      inputs.grayjay.packages.${pkgs.system}.grayjay
    ];
 }
 ```

@@ -71,41 +71,10 @@
           StartupWMClass=Grayjay
           EOF
           
-          # FUTO Updater desktop file
-          cat > $out/share/applications/futo-updater.desktop << EOF
-          [Desktop Entry]
-          Name=FUTO Updater
-          Type=Application
-          GenericName=FUTO Updater Client
-          Comment=Update manager for FUTO applications like Grayjay
-          Icon=${grayjay-base}/share/icons/grayjay.png
-          Exec=grayjay --updater
-          Terminal=false
-          Categories=System;Utility;
-          StartupNotify=true
-          StartupWMClass=FUTO.Updater.Client
-          EOF
         '';
 
         # Main Grayjay FHS wrapper
         grayjay-fhs-wrapper = pkgs.writeShellScriptBin "grayjay" ''
-          # Check if the --updater flag is present
-          RUN_UPDATER=0
-          for arg in "$@"; do
-            if [ "$arg" = "--updater" ]; then
-              RUN_UPDATER=1
-              break
-            fi
-          done
-          
-          # Strip --updater from arguments if present
-          ARGS=()
-          for arg in "$@"; do
-            if [ "$arg" != "--updater" ]; then
-              ARGS+=("$arg")
-            fi
-          done
-          
           # Execute the FHS environment with appropriate arguments
           exec ${grayjay-fhs}/bin/grayjay-fhs ''${RUN_UPDATER:+updater} "''${ARGS[@]}"
         '';
