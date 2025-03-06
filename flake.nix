@@ -48,35 +48,35 @@
           name = "grayjay-fhs";
           targetPkgs = pkgs: with pkgs; [
             # Add all the dependencies Grayjay needs here
-    libz
-    icu
-    openssl # For updater
+            libz
+            icu
+            openssl # For updater
 
-    xorg.libX11
-    xorg.libXcomposite
-    xorg.libXdamage
-    xorg.libXext
-    xorg.libXfixes
-    xorg.libXrandr
-    xorg.libxcb
+            xorg.libX11
+            xorg.libXcomposite
+            xorg.libXdamage
+            xorg.libXext
+            xorg.libXfixes
+            xorg.libXrandr
+            xorg.libxcb
 
-    gtk3
-    glib
-    nss
-    nspr
-    dbus
-    atk
-    cups
-    libdrm
-    expat
-    libxkbcommon
-    pango
-    cairo
-    udev
-    alsa-lib
-    mesa
-    libGL
-    libsecret
+            gtk3
+            glib
+            nss
+            nspr
+            dbus
+            atk
+            cups
+            libdrm
+            expat
+            libxkbcommon
+            pango
+            cairo
+            udev
+            alsa-lib
+            mesa
+            libGL
+            libsecret
           ];
 
           # Set environment variables and copy files to a writable directory
