@@ -9,12 +9,12 @@ This repository provides a Nix flake for Grayjay, an open-source media streaming
 ## Table of Contents
 1. [Features](#features)
 2. [Installation](#installation)
+
    - [Using the Flake Directly](#using-the-flake-directly)
-   - [Integrating with Home Manager](#integrating-with-home-manager)
+
 3. [Configuration](#configuration)
-4. [Troubleshooting](#troubleshooting)
-5. [Contributing](#contributing)
-6. [License](#license)
+4. [Contributing](#contributing)
+5. [License](#license)
 
 ---
 
@@ -90,7 +90,5 @@ git push origin my-feature
 This flake is licensed under the MIT License. Grayjay itself is licensed under the GPL-3.0 License.
 
 ### Acknowledgments
-
-## Acknowledgments
 - [Gayjay](https://github.com/futo-org/Grayjay.Desktop) is a multi-platform media application that allows you to watch content from multiple platforms in a single application. Using an extendable plugin system developers can make new integrations with additional platforms. Plugins are cross-compatible between Android and Desktop.
 - The NixOS community for their support and resources.
