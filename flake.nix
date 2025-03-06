@@ -1,5 +1,5 @@
 {
-  description = "Grayjay Desktop Application with FHS Environment";
+  description = "Grayjay Desktop Application with FHS Environment and Desktop Entry";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
@@ -35,41 +35,57 @@
           chmod +x "$GRAYJAY_EXECUTABLE"
           mkdir -p $out/bin
           ln -s "$GRAYJAY_EXECUTABLE" $out/bin/grayjay
+
+          # Copy the icon to the share directory
+          mkdir -p $out/share/icons
+          cp "$out/share/grayjay/Grayjay.Desktop-linux-x64-v5/grayjay.png" $out/share/icons/
         '';
       };
 
       grayjay-fhs = pkgs.buildFHSEnv {
         name = "grayjay-fhs";
         targetPkgs = pkgs: with pkgs; [
-             libz
-    icu
-    openssl # For updater
+          # Add all the dependencies Grayjay needs here
+          libz
+          icu
+          openssl
 
-    xorg.libX11
-    xorg.libXcomposite
-    xorg.libXdamage
-    xorg.libXext
-    xorg.libXfixes
-    xorg.libXrandr
-    xorg.libxcb
+          xorg.libX11
+          xorg.libXcomposite
+          xorg.libXdamage
+          xorg.libXext
+          xorg.libXfixes
+          xorg.libXrandr
+          xorg.libxcb
 
-    gtk3
-    glib
-    nss
-    nspr
-    dbus
-    atk
-    cups
-    libdrm
-    expat
-    libxkbcommon
-    pango
-    cairo
-    udev
-    alsa-lib
-    mesa
-    libGL
-    libsecret
+          gtk3
+          glib
+          nss
+          nspr
+          dbus
+          atk
+          cups
+          libdrm
+          expat
+          libxkbcommon
+          pango
+          cairo
+          udev
+          alsa-lib
+          mesa
+          libGL
+          libsecret
+
+          # Additional dependencies (if needed)
+          zlib
+          libuuid
+          libappindicator
+          libnotify
+
+          # Add missing dependencies
+          upower
+          xdg-desktop-portal
+          libsecret
         ];
 
         # Set environment variables and copy files to a writable directory
@@ -97,30 +113,40 @@
         desktopName = "Grayjay";
         genericName = "Desktop Client for Grayjay";
         comment = "A desktop client for Grayjay to stream and download video content";
-        icon = "${self.packages.${system}.grayjay}/share/grayjay/Grayjay.Desktop-linux-x64-v5/grayjay.png";
+        icon = "${self.packages.${system}.grayjay}/share/icons/grayjay.png";
         exec = "grayjay-fhs";
         terminal = false;
         categories = [ "Network" ];
-        keywords = [
-          "YouTube"
-          "Player"
-        ];
+        keywords = [ "YouTube" "Player" ];
         startupNotify = true;
         startupWMClass = "Grayjay";
         prefersNonDefaultGPU = false;
       };
 
-      default = self.packages.${system}.grayjay-fhs;
+      # Combine everything into a single package
+      grayjay-with-desktop = pkgs.symlinkJoin {
+        name = "grayjay-with-desktop";
+        paths = [
+          self.packages.${system}.grayjay
+          self.packages.${system}.grayjay-fhs
+          (pkgs.runCommand "grayjay-desktop-file" {} ''
+            mkdir -p $out/share/applications
+            cp ${self.packages.${system}.grayjay-desktop-file}/share/applications/*.desktop $out/share/applications/
+          '')
+        ];
+      };
+
+      default = self.packages.${system}.grayjay-with-desktop;
     };
 
     apps.${system} = {
       grayjay = {
         type = "app";
-        program = "${self.packages.${system}.grayjay-fhs}/bin/grayjay-fhs";
+        program = "${self.packages.${system}.grayjay-with-desktop}/bin/grayjay-fhs";
       };
     };
 
-    defaultPackage.${system} = self.packages.${system}.grayjay-fhs;
+    defaultPackage.${system} = self.packages.${system}.grayjay-with-desktop;
     defaultApp.${system} = self.apps.${system}.grayjay;
   };
 }
