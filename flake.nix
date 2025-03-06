@@ -141,7 +141,5 @@
           };
         };
       };
-
-      defaultPackage.${system} = self.packages.${system}.grayjay-with-desktop;
     };
 }
