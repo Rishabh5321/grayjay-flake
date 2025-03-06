@@ -1,5 +1,5 @@
 {
-  description = "Grayjay Desktop Application with FHS Environment and Desktop Entry";
+  description = "Grayjay Desktop Application with FHS Environment and FUTO Updater";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
@@ -11,12 +11,13 @@
       pkgs = nixpkgs.legacyPackages.${system};
     in
     {
-      packages.${system} = {
-        grayjay = pkgs.stdenv.mkDerivation {
-          name = "grayjay-desktop";
+      packages.${system} = rec {
+        # Base Grayjay derivation - extracts the zip file
+        grayjay-base = pkgs.stdenv.mkDerivation {
+          name = "grayjay-base";
           src = pkgs.fetchurl {
             url = "https://updater.grayjay.app/Apps/Grayjay.Desktop/Grayjay.Desktop-linux-x64.zip";
-            sha256 = "sha256-Ahy4Li/rPnSTXaQHO6jbOgJLNUt9OizbFdZITJpiBRI="; # Replace with the actual SHA-256 hash
+            sha256 = "sha256-Ahy4Li/rPnSTXaQHO6jbOgJLNUt9OizbFdZITJpiBRI=";
           };
 
           nativeBuildInputs = [ pkgs.unzip ];
@@ -43,23 +44,80 @@
 
             # Make the executable and create a symlink in $out/bin
             chmod +x "$GRAYJAY_EXECUTABLE"
-            mkdir -p $out/bin
-            ln -s "$GRAYJAY_EXECUTABLE" $out/bin/grayjay
-
+            
             # Copy the icon to the share directory
             mkdir -p $out/share/icons
             cp "$out/share/grayjay/Grayjay.Desktop-linux-x64-v5/grayjay.png" $out/share/icons/
           '';
         };
 
+        # Desktop entry files
+        grayjay-desktop-files = pkgs.runCommand "grayjay-desktop-files" {} ''
+          mkdir -p $out/share/applications
+          
+          # Grayjay desktop file
+          cat > $out/share/applications/grayjay.desktop << EOF
+          [Desktop Entry]
+          Name=Grayjay
+          Type=Application
+          GenericName=Desktop Client for Grayjay
+          Comment=A desktop client for Grayjay to stream and download video content
+          Icon=${grayjay-base}/share/icons/grayjay.png
+          Exec=grayjay
+          Terminal=false
+          Categories=Network;
+          Keywords=YouTube;Player;
+          StartupNotify=true
+          StartupWMClass=Grayjay
+          EOF
+          
+          # FUTO Updater desktop file
+          cat > $out/share/applications/futo-updater.desktop << EOF
+          [Desktop Entry]
+          Name=FUTO Updater
+          Type=Application
+          GenericName=FUTO Updater Client
+          Comment=Update manager for FUTO applications like Grayjay
+          Icon=${grayjay-base}/share/icons/grayjay.png
+          Exec=grayjay --updater
+          Terminal=false
+          Categories=System;Utility;
+          StartupNotify=true
+          StartupWMClass=FUTO.Updater.Client
+          EOF
+        '';
+
+        # Main Grayjay FHS wrapper
+        grayjay-fhs-wrapper = pkgs.writeShellScriptBin "grayjay" ''
+          # Check if the --updater flag is present
+          RUN_UPDATER=0
+          for arg in "$@"; do
+            if [ "$arg" = "--updater" ]; then
+              RUN_UPDATER=1
+              break
+            fi
+          done
+          
+          # Strip --updater from arguments if present
+          ARGS=()
+          for arg in "$@"; do
+            if [ "$arg" != "--updater" ]; then
+              ARGS+=("$arg")
+            fi
+          done
+          
+          # Execute the FHS environment with appropriate arguments
+          exec ${grayjay-fhs}/bin/grayjay-fhs ''${RUN_UPDATER:+updater} "''${ARGS[@]}"
+        '';
+
+        # FHS environment
         grayjay-fhs = pkgs.buildFHSEnv {
           name = "grayjay-fhs";
           targetPkgs = pkgs: with pkgs; [
-            # Add all the dependencies Grayjay needs here
+            # Dependencies for both Grayjay and FUTO Updater
             libz
             icu
-            openssl # For updater
-
+            openssl
             xorg.libX11
             xorg.libXcomposite
             xorg.libXdamage
@@ -67,7 +125,6 @@
             xorg.libXfixes
             xorg.libXrandr
             xorg.libxcb
-
             gtk3
             glib
             nss
@@ -85,8 +142,6 @@
             mesa
             libGL
             libsecret
-            
-            # Additional dependencies that FUTO Updater might need
             dotnet-runtime
             curl
           ];
@@ -98,7 +153,7 @@
             mkdir -p "$GRAYJAY_DATA_DIR"
 
             # Copy the entire Grayjay.Desktop-linux-x64-v5 directory to the writable directory
-            GRAYJAY_SRC_DIR="${self.packages.${system}.grayjay}/share/grayjay/Grayjay.Desktop-linux-x64-v5"
+            GRAYJAY_SRC_DIR="${grayjay-base}/share/grayjay/Grayjay.Desktop-linux-x64-v5"
             GRAYJAY_DEST_DIR="$GRAYJAY_DATA_DIR/Grayjay.Desktop-linux-x64-v5"
             
             # Only copy if the directory doesn't exist or is older
@@ -121,7 +176,8 @@
               # Run FUTO Updater if it exists
               if [ -f "$FUTO_UPDATER" ]; then
                 cd "$GRAYJAY_DEST_DIR"
-                exec ./FUTO.Updater.Client
+                shift  # Remove the "updater" argument
+                exec ./FUTO.Updater.Client "$@"
               else
                 echo "Error: FUTO.Updater.Client not found!"
                 exit 1
@@ -135,88 +191,37 @@
                 "$FUTO_UPDATER" --check-updates &
               fi
               
-              # Then launch Grayjay
-              exec ./Grayjay
+              # Then launch Grayjay with any passed arguments
+              exec ./Grayjay "$@"
             fi
           '';
         };
 
-        # Create a separate wrapper script for running the updater directly
-        futo-updater-fhs = pkgs.writeShellScriptBin "futo-updater-fhs" ''
-          exec ${self.packages.${system}.grayjay-fhs}/bin/grayjay-fhs updater
-        '';
-
-        # Grayjay desktop file
-        grayjay-desktop-file = pkgs.makeDesktopItem {
-          name = "Grayjay";
-          type = "Application";
-          desktopName = "Grayjay";
-          genericName = "Desktop Client for Grayjay";
-          comment = "A desktop client for Grayjay to stream and download video content";
-          icon = "${self.packages.${system}.grayjay}/share/icons/grayjay.png";
-          exec = "grayjay-fhs";
-          terminal = false;
-          categories = [ "Network" ];
-          keywords = [ "YouTube" "Player" ];
-          startupNotify = true;
-          startupWMClass = "Grayjay";
-          prefersNonDefaultGPU = false;
-        };
-
-        # FUTO Updater desktop file
-        futo-updater-desktop-file = pkgs.makeDesktopItem {
-          name = "FUTO-Updater";
-          type = "Application";
-          desktopName = "FUTO Updater";
-          genericName = "FUTO Updater Client";
-          comment = "Update manager for FUTO applications like Grayjay";
-          icon = "${self.packages.${system}.grayjay}/share/icons/grayjay.png";
-          exec = "futo-updater-fhs";
-          terminal = false;
-          categories = [ "System" "Utility" ];
-          startupNotify = true;
-          startupWMClass = "FUTO.Updater.Client";
-        };
-
-        # Combine everything into a single package
-        grayjay-with-updater = pkgs.symlinkJoin {
-          name = "grayjay-with-updater";
+        # The final combined package
+        grayjay = pkgs.symlinkJoin {
+          name = "grayjay";
           paths = [
-            self.packages.${system}.grayjay-fhs
-            self.packages.${system}.futo-updater-fhs
-            (pkgs.runCommand "desktop-files" { } ''
-              mkdir -p $out/share/applications
-              cp ${self.packages.${system}.grayjay-desktop-file}/share/applications/*.desktop $out/share/applications/
-              cp ${self.packages.${system}.futo-updater-desktop-file}/share/applications/*.desktop $out/share/applications/
-            '')
+            grayjay-fhs-wrapper
+            grayjay-desktop-files
           ];
         };
 
-        default = self.packages.${system}.grayjay-with-updater;
+        # Set the default package
+        default = grayjay;
       };
 
       apps.${system} = {
         grayjay = {
           type = "app";
-          program = "${self.packages.${system}.grayjay-with-updater}/bin/grayjay-fhs";
+          program = "${self.packages.${system}.grayjay}/bin/grayjay";
           meta = {
             description = "Desktop client for Grayjay with integrated FUTO Updater";
-            license = pkgs.lib.licenses.unfree; # Adjust the license as needed
-            maintainers = [ ]; # Add maintainers if applicable
+            license = pkgs.lib.licenses.unfree;
             platforms = pkgs.lib.platforms.linux;
           };
         };
         
-        futo-updater = {
-          type = "app";
-          program = "${self.packages.${system}.grayjay-with-updater}/bin/futo-updater-fhs";
-          meta = {
-            description = "FUTO Updater Client for Grayjay";
-            license = pkgs.lib.licenses.unfree; # Adjust the license as needed
-            maintainers = [ ]; # Add maintainers if applicable
-            platforms = pkgs.lib.platforms.linux;
-          };
-        };
+        default = self.apps.${system}.grayjay;
       };
     };
 }

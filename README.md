@@ -1,4 +1,4 @@
-# Grayjay Flake
+# Grayjay Flake CURRENTLY IN DEVLOPMENT AND NOT WORKING
 
 [![NixOS](https://img.shields.io/badge/NixOS-supported-blue.svg)](https://nixos.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
