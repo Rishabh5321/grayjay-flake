@@ -46,17 +46,18 @@
             chmod +x "$GRAYJAY_EXECUTABLE"
             
             # Copy the icon to the share directory
-            mkdir -p $out/share/icons
-            cp "$out/share/grayjay/Grayjay.Desktop-linux-x64-v5/grayjay.png" $out/share/icons/
+            mkdir -p $out/share/icons/hicolor/256x256/apps
+            cp "$out/share/grayjay/Grayjay.Desktop-linux-x64-v5/grayjay.png" $out/share/icons/hicolor/256x256/apps/grayjay.png
           '';
         };
+
         # Desktop entry files
         grayjay-desktop-files = pkgs.runCommand "grayjay-desktop-files" { } ''
           mkdir -p $out/share/applications
           mkdir -p $out/share/icons/hicolor/256x256/apps
 
           # Copy the icon to the appropriate directory
-          cp "${grayjay-base}/share/icons/grayjay.png" $out/share/icons/hicolor/256x256/apps/grayjay.png
+          cp "${grayjay-base}/share/icons/hicolor/256x256/apps/grayjay.png" $out/share/icons/hicolor/256x256/apps/grayjay.png
 
           # Grayjay desktop file
           cat > $out/share/applications/grayjay.desktop << EOF
