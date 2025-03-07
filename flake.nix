@@ -125,10 +125,12 @@
             GRAYJAY_SRC_DIR="${grayjay-base}/share/grayjay/Grayjay.Desktop-linux-x64-v5"
             GRAYJAY_DEST_DIR="$GRAYJAY_DATA_DIR/Grayjay.Desktop-linux-x64-v5"
             
-            # Only copy if the directory doesn't exist or is older
             if [ ! -d "$GRAYJAY_DEST_DIR" ] || [ "$GRAYJAY_SRC_DIR" -nt "$GRAYJAY_DEST_DIR" ]; then
-              rm -rf "$GRAYJAY_DEST_DIR"
-              cp -r "$GRAYJAY_SRC_DIR" "$GRAYJAY_DEST_DIR"
+              # Create the destination directory if it doesn't exist
+              mkdir -p "$GRAYJAY_DEST_DIR"
+              # Copy and overwrite contents from source to destination
+              cp -rT "$GRAYJAY_SRC_DIR" "$GRAYJAY_DEST_DIR"
+              # Ensure the destination directory is writable by the user
               chmod -R u+w "$GRAYJAY_DEST_DIR"
             fi
 
