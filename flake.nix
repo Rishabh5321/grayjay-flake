@@ -50,11 +50,14 @@
             cp "$out/share/grayjay/Grayjay.Desktop-linux-x64-v5/grayjay.png" $out/share/icons/
           '';
         };
-
         # Desktop entry files
         grayjay-desktop-files = pkgs.runCommand "grayjay-desktop-files" { } ''
           mkdir -p $out/share/applications
-          
+          mkdir -p $out/share/icons/hicolor/256x256/apps
+
+          # Copy the icon to the appropriate directory
+          cp "${grayjay-base}/share/icons/grayjay.png" $out/share/icons/hicolor/256x256/apps/grayjay.png
+
           # Grayjay desktop file
           cat > $out/share/applications/grayjay.desktop << EOF
           [Desktop Entry]
@@ -62,7 +65,7 @@
           Type=Application
           GenericName=Desktop Client for Grayjay
           Comment=A desktop client for Grayjay to stream and download video content
-          Icon=${grayjay-base}/share/icons/grayjay.png
+          Icon=grayjay
           Exec=grayjay
           Terminal=false
           Categories=Network;
@@ -70,7 +73,6 @@
           StartupNotify=true
           StartupWMClass=Grayjay
           EOF
-          
         '';
 
         # Main Grayjay FHS wrapper
