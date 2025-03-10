@@ -65,7 +65,7 @@ nh os boot --hostname <your-hostname> <your-flake-dir>
 ```
 4. Simply start the app using app launcher or using terminal:
 ```bash
-grayjay-fhs
+grayjay
 ```
 
 ### Contributing
