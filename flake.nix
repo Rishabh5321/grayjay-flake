@@ -87,6 +87,7 @@
           name = "grayjay-fhs";
           targetPkgs = pkgs: with pkgs; [
             # Dependencies for both Grayjay and FUTO Updater
+            libgbm
             libz
             icu
             openssl
