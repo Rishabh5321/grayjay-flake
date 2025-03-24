@@ -50,7 +50,7 @@ grayjay.url = "github:rishabh5321/grayjay-flake";
 2. Import the grayjay module in your NixOS configuration in home.nix:
 ```nix
 { inputs, ... }: {
-   imports = [
+   environment.systemPackages = [  
       inputs.grayjay.packages.${pkgs.system}.grayjay
    ];
 }
