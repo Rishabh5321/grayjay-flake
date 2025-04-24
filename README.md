@@ -1,4 +1,7 @@
-# Grayjay Flake
+# THIS PKG IS NOW AVAILABLE IN NIXPKGS
+
+
+# Grayjay Flake  
 
 [![NixOS](https://img.shields.io/badge/NixOS-supported-blue.svg)](https://nixos.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
