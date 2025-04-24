@@ -181,8 +181,13 @@
           ];
         };
 
-        # Set the default package
-        default = grayjay;
+        default = builtins.trace ''
+          ⚠️ WARNING from Grayjay flake:
+          Grayjay is now officially available in nixpkgs as 'grayjay'.
+          This flake provides a custom FHS environment + FUTO updater,
+          but will be unsuported and has been archived.
+          Consider switching to: nix run nixpkgs#grayjay
+        '' grayjay;
       };
 
       apps.${system} = {
