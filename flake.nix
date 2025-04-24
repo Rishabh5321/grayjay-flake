@@ -187,7 +187,8 @@
           This flake provides a custom FHS environment + FUTO updater,
           but will be unsuported and has been archived.
           Consider switching to: nix run nixpkgs#grayjay
-        '' grayjay;
+        ''
+          grayjay;
       };
 
       apps.${system} = {
