@@ -17,7 +17,7 @@
           name = "grayjay-base";
           src = pkgs.fetchurl {
             url = "https://updater.grayjay.app/Apps/Grayjay.Desktop/Grayjay.Desktop-linux-x64.zip";
-            sha256 = "sha256-Ahy4Li/rPnSTXaQHO6jbOgJLNUt9OizbFdZITJpiBRI=";
+            sha256 = "sha256-XVP6WL0BXESGv3j+UrrFCSfMIIW0d8z8J5ihXjPjzNc=";
           };
 
           nativeBuildInputs = [ pkgs.unzip ];
@@ -28,14 +28,14 @@
             unzip $src -d $out/share/grayjay
 
             # Ensure the Grayjay executable exists
-            GRAYJAY_EXECUTABLE="$out/share/grayjay/Grayjay.Desktop-linux-x64-v5/Grayjay"
+            GRAYJAY_EXECUTABLE="$out/share/grayjay/Grayjay.Desktop-linux-x64-v7/Grayjay"
             if [ ! -f "$GRAYJAY_EXECUTABLE" ]; then
               echo "Error: Grayjay executable not found in the extracted files!"
               exit 1
             fi
 
             # Check for FUTO.Updater.Client in the same directory
-            FUTO_UPDATER="$out/share/grayjay/Grayjay.Desktop-linux-x64-v5/FUTO.Updater.Client"
+            FUTO_UPDATER="$out/share/grayjay/Grayjay.Desktop-linux-x64-7/FUTO.Updater.Client"
             if [ ! -f "$FUTO_UPDATER" ]; then
               echo "Warning: FUTO.Updater.Client not found in the extracted files!"
             else
@@ -47,7 +47,7 @@
             
             # Copy the icon to the share directory
             mkdir -p $out/share/icons/hicolor/256x256/apps
-            cp "$out/share/grayjay/Grayjay.Desktop-linux-x64-v5/grayjay.png" $out/share/icons/hicolor/256x256/apps/grayjay.png
+            cp "$out/share/grayjay/Grayjay.Desktop-linux-x64-v7/grayjay.png" $out/share/icons/hicolor/256x256/apps/grayjay.png
           '';
         };
 
@@ -125,9 +125,9 @@
             export GRAYJAY_DATA_DIR="$HOME/.grayjay"
             mkdir -p "$GRAYJAY_DATA_DIR"
 
-            # Copy the entire Grayjay.Desktop-linux-x64-v5 directory to the writable directory
-            GRAYJAY_SRC_DIR="${grayjay-base}/share/grayjay/Grayjay.Desktop-linux-x64-v5"
-            GRAYJAY_DEST_DIR="$GRAYJAY_DATA_DIR/Grayjay.Desktop-linux-x64-v5"
+            # Copy the entire Grayjay.Desktop-linux-x64-v7 directory to the writable directory
+            GRAYJAY_SRC_DIR="${grayjay-base}/share/grayjay/Grayjay.Desktop-linux-x64-v7"
+            GRAYJAY_DEST_DIR="$GRAYJAY_DATA_DIR/Grayjay.Desktop-linux-x64-v7"
             
             if [ ! -d "$GRAYJAY_DEST_DIR" ] || [ "$GRAYJAY_SRC_DIR" -nt "$GRAYJAY_DEST_DIR" ]; then
               # Create the destination directory if it doesn't exist
@@ -181,14 +181,7 @@
           ];
         };
 
-        default = builtins.trace ''
-          ⚠️ WARNING from Grayjay flake:
-          Grayjay is now officially available in nixpkgs as 'grayjay'.
-          This flake provides a custom FHS environment + FUTO updater,
-          but will be unsuported and has been archived.
-          Consider switching to: nix run nixpkgs#grayjay
-        ''
-          grayjay;
+        default = grayjay;
       };
 
       apps.${system} = {
