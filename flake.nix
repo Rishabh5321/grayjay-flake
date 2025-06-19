@@ -17,7 +17,7 @@
           name = "grayjay-base";
           src = pkgs.fetchurl {
             url = "https://updater.grayjay.app/Apps/Grayjay.Desktop/Grayjay.Desktop-linux-x64.zip";
-            sha256 = "sha256-XVP6WL0BXESGv3j+UrrFCSfMIIW0d8z8J5ihXjPjzNc=";
+            sha256 = "sha256-ReArwI4T+x3fWSGfKxPgL/yRqw7flVOlQ2wMywcZF5k=";
           };
 
           nativeBuildInputs = [ pkgs.unzip ];
@@ -28,14 +28,14 @@
             unzip $src -d $out/share/grayjay
 
             # Ensure the Grayjay executable exists
-            GRAYJAY_EXECUTABLE="$out/share/grayjay/Grayjay.Desktop-linux-x64-v7/Grayjay"
+            GRAYJAY_EXECUTABLE="$out/share/grayjay/Grayjay.Desktop-linux-x64-v8/Grayjay"
             if [ ! -f "$GRAYJAY_EXECUTABLE" ]; then
               echo "Error: Grayjay executable not found in the extracted files!"
               exit 1
             fi
 
             # Check for FUTO.Updater.Client in the same directory
-            FUTO_UPDATER="$out/share/grayjay/Grayjay.Desktop-linux-x64-7/FUTO.Updater.Client"
+            FUTO_UPDATER="$out/share/grayjay/Grayjay.Desktop-linux-x64-v8/FUTO.Updater.Client"
             if [ ! -f "$FUTO_UPDATER" ]; then
               echo "Warning: FUTO.Updater.Client not found in the extracted files!"
             else
@@ -44,10 +44,10 @@
 
             # Make the executable and create a symlink in $out/bin
             chmod +x "$GRAYJAY_EXECUTABLE"
-            
+
             # Copy the icon to the share directory
             mkdir -p $out/share/icons/hicolor/256x256/apps
-            cp "$out/share/grayjay/Grayjay.Desktop-linux-x64-v7/grayjay.png" $out/share/icons/hicolor/256x256/apps/grayjay.png
+            cp "$out/share/grayjay/Grayjay.Desktop-linux-x64-v8/grayjay.png" $out/share/icons/hicolor/256x256/apps/grayjay.png
           '';
         };
 
@@ -125,10 +125,10 @@
             export GRAYJAY_DATA_DIR="$HOME/.grayjay"
             mkdir -p "$GRAYJAY_DATA_DIR"
 
-            # Copy the entire Grayjay.Desktop-linux-x64-v7 directory to the writable directory
-            GRAYJAY_SRC_DIR="${grayjay-base}/share/grayjay/Grayjay.Desktop-linux-x64-v7"
-            GRAYJAY_DEST_DIR="$GRAYJAY_DATA_DIR/Grayjay.Desktop-linux-x64-v7"
-            
+            # Copy the entire Grayjay.Desktop-linux-x64-v8 directory to the writable directory
+            GRAYJAY_SRC_DIR="${grayjay-base}/share/grayjay/Grayjay.Desktop-linux-x64-v8"
+            GRAYJAY_DEST_DIR="$GRAYJAY_DATA_DIR/Grayjay.Desktop-linux-x64-v8"
+
             if [ ! -d "$GRAYJAY_DEST_DIR" ] || [ "$GRAYJAY_SRC_DIR" -nt "$GRAYJAY_DEST_DIR" ]; then
               # Create the destination directory if it doesn't exist
               mkdir -p "$GRAYJAY_DEST_DIR"
@@ -160,12 +160,12 @@
             else
               # Run Grayjay with updater check
               cd "$GRAYJAY_DEST_DIR"
-              
+
               # Launch the FUTO Updater in background first to check for updates if it exists
               if [ -f "$FUTO_UPDATER" ]; then
                 "$FUTO_UPDATER" --check-updates &
               fi
-              
+
               # Then launch Grayjay with any passed arguments
               exec ./Grayjay "$@"
             fi
